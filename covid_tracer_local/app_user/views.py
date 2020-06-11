@@ -6,6 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.list import ListView
 from django.views import View
 from django.conf import settings
 from django.core import serializers
@@ -16,13 +17,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import F, Q, Count
 
 from app_user.forms import PersInfoForm
+from app_user.models import PersInfo
 
 # Create your views here.
 def home(request):
     return render(request, 'app_user/home.html')
 
 
-class AddAppUser(View):
+class AddAppUserView(View):
     """ add pers info of a new app user """
     template = 'app_user/add_single_user.html'
     def get(self, request):
@@ -43,3 +45,21 @@ class AddAppUser(View):
                 'form': form,
             }
             return render(request, self.template, context)
+
+class UsersListView(ListView):
+    """ display truncated user list with option to delete any one """
+    model = PersInfo
+    template_name = 'app_user/users_list.html'
+
+
+def delete_app_user(request):
+    """ delete an app user of given id """
+    if request.method == "POST":
+        try:
+            app_user_id = request.POST['app_user_id']
+        except ObjectDoesNotExist:
+            return HttpResponse(status=404)
+        PersInfo.objects.get(pk=app_user_id).delete()
+        return HttpResponse(status=204)
+        
+    

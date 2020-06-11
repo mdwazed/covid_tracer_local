@@ -11,7 +11,7 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
                     <li class="nav-item active">
-                        <a class="nav-link text-white" href="">Home <span
+                        <a class="nav-link text-white" href="{% url "home" %}">Home <span
                                 class="sr-only">(current)</span></a>
                     </li>
 
@@ -23,6 +23,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="{% url 'add_app_user' %}">Add app user</a>
                             <a class="dropdown-item" href="">Add bulk user</a>
+                            <a class="dropdown-item" href="{% url 'users_list' %}">Users List</a>
                             <a class="dropdown-item" href="">Trace</a>
                         </div>
                     </li>

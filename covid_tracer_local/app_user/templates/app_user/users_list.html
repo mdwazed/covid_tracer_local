@@ -1,0 +1,50 @@
+{% extends 'app_user/layout.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div>
+        <h4>App Users</h4>
+    </div>
+
+    <div class="container">
+        <table class="table table-hover table-sm" id="users-list">
+            <thead>
+                <tr>
+                    <th>User gen ID</th> <th>App gen ID</th> <th>Pers No</th>
+                    <th>Rank</th> <th>Nmae</th> <th>unit</th> <th>Mob no</th>
+                    <th>Action</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in object_list %}
+                <tr>
+                    <td>{{ user.user_gen_id }}</td>
+                    <td>{{ user.app_gen_id }}</td>
+                    <td>{{ user.pers_no }}</td>
+                    <td>{{ user.rank }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.unit }}</td>
+                    <td>{{ user.mob_no }}</td>
+                    <td>
+                        <input type="hidden" value="{{ user.id }}">
+                        <button type="button" class="btn btn-link delete-btn" style="padding: 0;">Delete</button>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+            
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        var csrf_token = '{{ csrf_token }}'
+    </script>
+
+    <script src="{% static 'assets/javascript/users_list.js' %}"></script>
+{% endblock %}

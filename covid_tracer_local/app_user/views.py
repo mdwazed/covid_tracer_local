@@ -11,18 +11,44 @@ from django.views import View
 from django.conf import settings
 from django.core import serializers
 from django.urls import reverse_lazy 
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import F, Q, Count
 
-from app_user.forms import PersInfoForm
+from app_user.forms import PersInfoForm, LoginForm
 from app_user.models import PersInfo
 
 # Create your views here.
 def home(request):
     return render(request, 'app_user/home.html')
 
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+    return redirect('home')
+
+def login_view(request):
+    if request.method == "GET":
+        form = LoginForm()
+        return render(request, 'app_user/login.html', {'form': form})
+
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            form = LoginForm(request.POST)
+            msg = 'Login Failed'
+            context = {
+                'form': form,
+                'msg': msg,
+            }
+            return render(request, 'app_user/login.html', context)
 
 class AddAppUserView(View):
     """ add pers info of a new app user """
@@ -61,5 +87,9 @@ def delete_app_user(request):
             return HttpResponse(status=404)
         PersInfo.objects.get(pk=app_user_id).delete()
         return HttpResponse(status=204)
+
+def search_app_user(request):
+    """ Display an app user for admin purpose """
+    pass
         
     

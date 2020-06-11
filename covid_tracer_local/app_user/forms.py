@@ -11,6 +11,9 @@ rank_choices = [
 ]
     
 
+class LoginForm(forms.Form):
+    username = forms.CharField(label='User Name', max_length=20)
+    password = forms.CharField(label='Password', max_length=20, widget=forms.PasswordInput)
 
 class PersInfoForm(ModelForm):
     rank = forms.ChoiceField(choices=rank_choices)

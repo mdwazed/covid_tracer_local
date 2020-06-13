@@ -1,0 +1,57 @@
+{% extends 'app_user/layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div>
+        <h4>Contacted list of </h4>
+        <div class="flex-div-even-spaced">
+            <p>
+                <span>{{source.rank}}</span>&nbsp;<span>{{source.name}}</span>&nbsp;
+                <span>{{ source.unit }}</span> 
+            </p>
+            <p>
+                <span>Total count:</span>
+                &nbsp;<span>{{users|length}}</span>
+            </p>
+            <p>
+                <span>Date:</span>&nbsp;<span>{{from_date}}</span>&nbsp;<span>to</span>
+                &nbsp;<span>{{ to_date }}</span>
+            </p>
+        </div>
+        
+    </div>
+
+    <div>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                 <th>Pers no</th>
+                 <th>Rank</th>
+                 <th>Name</th>
+                 <th>Unit</th>
+                 <th>Mob No</th>
+                 <th>Rmks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.pers_num }}</td>
+                        <td>{{ user.rank }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.unit }}</td>
+                        <td>{{ user.mobile_num }}</td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <button class="btn btn-primary btn-print">Print</button>
+    </div>
+</div>
+
+{% endblock %}
+

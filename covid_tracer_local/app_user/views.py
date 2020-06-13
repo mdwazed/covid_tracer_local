@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist, ValidationError, MultipleObjectsReturned
+from django.core.exceptions import (ObjectDoesNotExist, ValidationError, 
+        MultipleObjectsReturned, EmptyResultSet)
 from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from django.http import HttpResponse, JsonResponse
@@ -63,6 +64,8 @@ class AddAppUserView(View):
     def post(self, request):
         form = PersInfoForm(request.POST)
         if form.is_valid():
+            # http call here to validate id pair from backend server
+
             form.save()
             success_msg = 'App user saved successfully.'
             return render(request, self.template, {'success_msg': success_msg})
@@ -88,8 +91,58 @@ def delete_app_user(request):
         PersInfo.objects.get(pk=app_user_id).delete()
         return HttpResponse(status=204)
 
-def search_app_user(request):
-    """ Display an app user for admin purpose """
-    pass
+class GetContactsView(View):
+    """ Receive the person to be traced """
+    template = 'app_user/get_contacts.html'
+
+    def get(self, request):
+
+        context = {
+
+        }
+        return render(request, self.template, context)
+
+    def post(self, request):
+        try:
+            app_gen_id = request.POST.get('app-gen-id')
+            app_user = PersInfo.objects.get(app_gen_id=app_gen_id)
+        except (ValueError, ObjectDoesNotExist) as e:
+            err_msg = "Enter a valid ID." + str(e)
+            return render(request, self.template, {'err_msg':err_msg})
+        context = {
+            'app_user': app_user,
+        }
+        return render(request, self.template, context)
+
+class GetContactListView(View):
+    """ Returns a list of contacted app_users """
+    template = 'app_user/contacted_list.html'
+    def post(self, request):
+        try:
+            app_user_id = request.POST.get('app-user-id')
+            from_date = request.POST.get('from-date')
+            to_date = request.POST.get('to-date')
+            print(f'{from_date}--{to_date}')
+        except ValueError as e:
+            err_msg = "Post data error" + str(e)
+            return render(request, self.template, {'err_msg': err_msg})
+        source_user = PersInfo.objects.get(pk=app_user_id)
+        # API call to get the list of contacted pers
+        print(source_user.app_gen_id)
+
+        contacted_list = [5478941, 32587465]
+        try:
+            users = PersInfo.objects.filter(app_gen_id__in=contacted_list)
+        except EmptyResultSet:
+            err_msg = "No contact data found in database."
+            return render(request, self.template, {'err_msg': err_msg})
+        context = {
+            'source': source_user,
+            'users': users,
+            'from_date': from_date,
+            'to_date': to_date,
+        }
+        return render(request, self.template, context)
+
         
     

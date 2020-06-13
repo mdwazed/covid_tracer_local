@@ -1,0 +1,67 @@
+{% extends 'app_user/layout.html' %}
+{% load static %}
+{% block link %}
+<link rel="stylesheet" href="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.css' %}" />
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div>
+        <h4>Trace contacts</h4>
+    </div>
+
+    <div class="container">
+        <div class="instr">
+            {% if err_msg %}
+                <p>{{ err_msg }}</p>
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="text" name="app-gen-id" placeholder="App gen ID">
+                <button class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    {% if app_user %}
+    <div class="card">
+        <div class="card-body">
+            <p>Pers No: <span>{{ app_user.pers_num }}</span></p>
+            <p>Rank: <span>{{ app_user.rank }}</span></p>
+            <p>Name: <span>{{ app_user.name }}</span></p>
+            <p>Unit: <span>{{ app_user.unit }}</span></p>
+            <p>Mob No: <span>{{ app_user.mobile_num }}</span></p>
+        </div>
+        <div class="card-footer">
+            <form action="{% url 'get_contact_list' %}" method="POST">
+                {% csrf_token %}
+                From:
+                <input class="datepicker" type="text" name="from-date" placeholder="Date" autocomplete="off">
+                To:
+                <input class="datepicker" type="text" name="to-date" placeholder="Date" autocomplete="off">
+                <input type="hidden" name="app-user-id" value={{ app_user.id }}>
+                <button class="btn btn-primary" id="btn-contacts">Contacts</button>
+
+            </form>
+            
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static '/vendor/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+
+    <script type="text/javascript">
+        var csrf_token = '{{ csrf_token }}';
+        jQuery(function ($) {
+                $(".datepicker").datepicker({
+                    dateFormat: "dd-mm-yy",
+                    maxDate: "0d",
+                    // minDate: "-25d",
+                });
+            });
+    </script>
+
+    <script src="{% static 'assets/javascript/get_contacts.js' %}"></script>
+{% endblock %}

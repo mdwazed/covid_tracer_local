@@ -22,4 +22,4 @@ class PersInfo(models.Model):
     mobile_num = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
-        return self.sta_name
+        return self.name

@@ -4,38 +4,72 @@
 <div class="container">
     <div>
         <h4>App Users</h4>
+        
+    </div>
+    <div>
+        
     </div>
 
     <div class="container">
-        <table class="table table-hover table-sm" id="users-list">
-            <thead>
-                <tr>
-                    <th>User gen ID</th> <th>App gen ID</th> <th>Pers No</th>
-                    <th>Rank</th> <th>Nmae</th> <th>unit</th> <th>Mob no</th>
-                    <th>Action</th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in object_list %}
-                <tr>
-                    <td>{{ user.user_gen_id }}</td>
-                    <td>{{ user.app_gen_id }}</td>
-                    <td>{{ user.pers_num }}</td>
-                    <td>{{ user.rank }}</td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.unit }}</td>
-                    <td>{{ user.mob_no }}</td>
-                    <td>
-                        <input type="hidden" value="{{ user.id }}">
-                        <button type="button" class="btn btn-link delete-btn" style="padding: 0;">Delete</button>
-                        
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
+        <div class="card">
+            <div class="card-body">
+                <form class="form-inline" method="POST">
+                    {% csrf_token %}
+                    <label class="col-sm-1 col-form-label" for="unit">Unit</label>
+                    {{ form.unit }}
+                    <label class="col-sm-1 col-form-label" for="rank">Rank</label>
+                    {{ form.rank }}
+                    <label class="col-sm-2 col-form-label" for="app-gen-id">App Gen Id</label>
+                    <div class="input-group mb-2 mr-sm-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Opt</div>
+                        </div>
+                        <input type="text" class="form-control" id="app-gen-id">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+            
+    <div class="container">
+        <div>
+            <table class="table table-hover table-sm" id="users-list">
+                <thead>
+                    <tr>
+                        <th>User gen ID</th>
+                        <th>App gen ID</th>
+                        <th>Pers No</th>
+                        <th>Rank</th>
+                        <th>Nmae</th>
+                        <th>unit</th>
+                        <th>Mob no</th>
+                        <th>Action</th>
+            
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.user_gen_id }}</td>
+                        <td>{{ user.app_gen_id }}</td>
+                        <td>{{ user.pers_num }}</td>
+                        <td>{{ user.rank }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.unit }}</td>
+                        <td>{{ user.mobile_num }}</td>
+                        <td>
+                            <input type="hidden" value="{{ user.id }}">
+                            <button type="button" class="btn btn-link delete-btn" style="padding: 0;">Delete</button>
+            
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            
+            </table>
+        </div>
+        
             
     </div>
 </div>

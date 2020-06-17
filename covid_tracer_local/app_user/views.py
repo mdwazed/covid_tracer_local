@@ -18,8 +18,14 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import F, Q, Count
 
-from app_user.forms import PersInfoForm, LoginForm
+from app_user.forms import (PersInfoForm, LoginForm, UserSearchForm,)
 from app_user.models import PersInfo
+
+from datetime import datetime
+
+import requests
+from requests.exceptions import HTTPError
+import json
 
 # Create your views here.
 def home(request):
@@ -65,10 +71,27 @@ class AddAppUserView(View):
         form = PersInfoForm(request.POST)
         if form.is_valid():
             # http call here to validate id pair from backend server
-
-            form.save()
-            success_msg = 'App user saved successfully.'
-            return render(request, self.template, {'success_msg': success_msg})
+            user_gen_id = form.cleaned_data['user_gen_id']
+            app_gen_id = form.cleaned_data['app_gen_id']
+            url = f'http://dev.workspaceit.com:8081/api/v1/user/valid/key/?user_gen_key={user_gen_id}&app_gen_key={app_gen_id}'
+            try:
+                response = requests.get(url)
+            except (HTTPError, requests.ConnectionError):
+                err_msg = "Error. Couldn't connect to the backend server."
+                return render(request, self.template, {'err_msg': err_msg})
+            if response.status_code == 200:
+                r_user = json.loads(response.text)
+                print(r_user)
+                if not r_user['status']:
+                    err_msg = "Not a valid user. Check ID pair."
+                    return render(request, self.template, {'err_msg': err_msg})
+                else:
+                    form.save()
+                    success_msg = 'App user saved successfully.'
+                    return render(request, self.template, {'success_msg': success_msg})
+            else:
+                err_msg = "Something went wrong in remote call. Contact Admin."
+                return render(request, self.template, {'err_msg': err_msg})
         else:
             context = {
                 'form': form,
@@ -80,6 +103,32 @@ class UsersListView(ListView):
     model = PersInfo
     template_name = 'app_user/users_list.html'
 
+class FilteredUsersListView(View):
+    """ display users list based on search criteria """
+    template = 'app_user/users_list.html'
+    def get(self, request):
+        form = UserSearchForm()
+        context = {
+            'form': form,
+        }
+        return render(request, self.template, context)
+    def post(self, request):
+        try:
+            unit = request.POST['unit']
+            rank = request.POST['rank']
+            app_gen_id = request.POST.get('app_gen_id', None)
+        except ValueError:
+            pass
+        if app_gen_id:
+            users = PersInfo.objects.filter(app_gen_id=app_gen_id)
+        else:
+            users = PersInfo.objects.filter(unit=unit, rank=rank)
+        form = UserSearchForm()
+        context = {
+            'users': users,
+            'form': form,
+        }
+        return render(request, self.template, context)
 
 def delete_app_user(request):
     """ delete an app user of given id """
@@ -118,31 +167,57 @@ class GetContactListView(View):
     """ Returns a list of contacted app_users """
     template = 'app_user/contacted_list.html'
     def post(self, request):
+        print(datetime.now())
         try:
-            app_user_id = request.POST.get('app-user-id')
-            from_date = request.POST.get('from-date')
-            to_date = request.POST.get('to-date')
-            print(f'{from_date}--{to_date}')
+            app_user_id = request.POST.get('app-user-id', None)
+            from_date = request.POST.get('from-date', None)
+            to_date = request.POST.get('to-date', None)
         except ValueError as e:
             err_msg = "Post data error" + str(e)
             return render(request, self.template, {'err_msg': err_msg})
-        source_user = PersInfo.objects.get(pk=app_user_id)
-        # API call to get the list of contacted pers
-        print(source_user.app_gen_id)
-
-        contacted_list = [5478941, 32587465]
         try:
-            users = PersInfo.objects.filter(app_gen_id__in=contacted_list)
-        except EmptyResultSet:
-            err_msg = "No contact data found in database."
+            source_user = PersInfo.objects.get(pk=app_user_id)
+        except ObjectDoesNotExist:
+            err_msg = "User doesn't exists" + str(e)
             return render(request, self.template, {'err_msg': err_msg})
-        context = {
-            'source': source_user,
-            'users': users,
-            'from_date': from_date,
-            'to_date': to_date,
-        }
-        return render(request, self.template, context)
-
+        if app_user_id and from_date and to_date:
+            from_date_obj = datetime.strptime(from_date, '%d-%m-%Y')
+            from_date_timestamp = int(datetime.timestamp(from_date_obj))
+            to_date_obj = datetime.strptime(to_date, '%d-%m-%Y')
+            to_date_timestamp = int(datetime.timestamp(to_date_obj))
+            app_gen_key = source_user.app_gen_id
+        else:
+            err_msg = "Please select both from and to date."
+            return render(request, self.template, {'err_msg': err_msg})
+        # API call to get the list of contacted pers
+        url = f"http://dev.workspaceit.com:8081/api/v1/user/get/contact/?app_gen_key={app_gen_key}&range_start={from_date_timestamp}&range_end={to_date_timestamp}"
+        print(url)
+        try:
+            response = requests.get(url)
+        except (HTTPError, requests.ConnectionError):
+            err_msg = "Error. Couldn't connect to the backend server."
+            return render(request, self.template, {'err_msg': err_msg})
+        if response.status_code == 200:
+            contact_data = json.loads(response.text)
+            # print(contact_data['data'])
+            contacted_users = []
+            for contact in contact_data['data']:
+                try:
+                    contacted_user = PersInfo.objects.get(app_gen_id=contact['receiver']) 
+                except ObjectDoesNotExist:
+                    pass
+                else:
+                    if contacted_user not in contacted_users:
+                        contacted_users.append(contacted_user)
+            context = {
+                'source': source_user,
+                'users': contacted_users,
+                'from_date': from_date,
+                'to_date': to_date,
+            }
+            return render(request, self.template, context)
+        else:
+            err_msg = "Remote server did not return 200."
+            return render(request, self.template, {'err_msg': err_msg})
         
     

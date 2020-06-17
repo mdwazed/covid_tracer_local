@@ -8,7 +8,7 @@ $(document).ready(function () {
     // delete app_user on delete btn click
     $('.delete-btn').on('click', function(){
         choice = confirm('Are you sure!! This user will be deleted from the system');
-        if ( choice=== true ){
+        if ( choice === true ){
             app_user_id = $(this).siblings('input').val();
             cur_row = $(this).closest('tr');
             rerurn_val = delete_user(app_user_id, cur_row);

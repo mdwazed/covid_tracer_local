@@ -11,14 +11,19 @@
             {% if success_msg %}
                 <h4><span class="badge badge-success">{{ success_msg }}</span></h4>
                 <a href="{% url 'add_app_user' %}">Add another</a>
+            {% elif err_msg %}
+                <h4><span class="badge badge-danger">{{ err_msg }}</span></h4>
+                <a href="{% url 'add_app_user' %}">Try Again</a>
             {% else %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <table>
-                        {{ form.as_table }}
-                    </table>
-                    <button class="btn btn-primary">Save</button>
-                </form>
+                <div>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <table>
+                            {{ form.as_table }}
+                        </table>
+                        <button class="btn btn-primary">Save</button>
+                    </form>
+                </div>
             {% endif %}
         </div>
     </div>

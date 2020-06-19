@@ -29,7 +29,11 @@ import json
 
 # Create your views here.
 def home(request):
-    return render(request, 'app_user/home.html')
+    past_date = datetime.today()
+    context = {
+        'past_date': past_date,
+    }
+    return render(request, 'app_user/home.html', context)
 
 def logout_view(request):
     if request.user.is_authenticated:
@@ -108,8 +112,10 @@ class FilteredUsersListView(View):
     template = 'app_user/users_list.html'
     def get(self, request):
         form = UserSearchForm()
+        users = PersInfo.objects.all()[:100]
         context = {
             'form': form,
+            'users': users,
         }
         return render(request, self.template, context)
     def post(self, request):
@@ -166,8 +172,9 @@ class GetContactsView(View):
 class GetContactListView(View):
     """ Returns a list of contacted app_users """
     template = 'app_user/contacted_list.html'
+
     def post(self, request):
-        print(datetime.now())
+        print(request.POST)
         try:
             app_user_id = request.POST.get('app-user-id', None)
             from_date = request.POST.get('from-date', None)
@@ -178,7 +185,7 @@ class GetContactListView(View):
         try:
             source_user = PersInfo.objects.get(pk=app_user_id)
         except ObjectDoesNotExist:
-            err_msg = "User doesn't exists" + str(e)
+            err_msg = "User doesn't exists."
             return render(request, self.template, {'err_msg': err_msg})
         if app_user_id and from_date and to_date:
             from_date_obj = datetime.strptime(from_date, '%d-%m-%Y')

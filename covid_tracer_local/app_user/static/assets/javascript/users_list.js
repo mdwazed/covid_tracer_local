@@ -13,7 +13,12 @@ $(document).ready(function () {
             cur_row = $(this).closest('tr');
             rerurn_val = delete_user(app_user_id, cur_row);
         }
-    })
+    });
+
+    // get last 7 days contact of this user
+    // $('.contact-btn').on('click', function(){
+
+    // });
 });
 
 

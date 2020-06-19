@@ -1,10 +1,13 @@
 {% extends 'app_user/layout.html' %}
 {% load static %}
+{% load addl_tags %}
+
 {% block content %}
 <div class="container">
     <div class="home-title">
         <div>
             <h2>COVID-19 Contact Tracer</h2>
+            {{ past_date | past3day }}
         </div>
         
     </div>

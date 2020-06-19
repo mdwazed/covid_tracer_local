@@ -1,5 +1,6 @@
 {% extends 'app_user/layout.html' %}
 {% load static %}
+{% load addl_tags %}
 {% block content %}
 <div class="container">
     <div>
@@ -61,7 +62,13 @@
                         <td>
                             <input type="hidden" value="{{ user.id }}">
                             <button type="button" class="btn btn-link delete-btn" style="padding: 0;">Delete</button>
-            
+                            <form action="{% url 'get_contact_list' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="from-date" value="{% past3day %}">
+                                <input type="hidden" name="to-date" value="{% now "d-m-Y" %}">
+                                <input type="hidden" name="app-user-id" value="{{ user.pk }}">
+                                ||<input type="submit" class="btn btn-link contact-btn" style="padding: 0;" value="Contact">
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}

@@ -27,6 +27,8 @@
             <thead>
                 <tr>
                  <th>Pers no</th>
+                 <th>User G ID</th>
+                 <th>App G ID</th>
                  <th>Rank</th>
                  <th>Name</th>
                  <th>Unit</th>
@@ -38,6 +40,8 @@
                 {% for user in users %}
                     <tr>
                         <td>{{ user.pers_num }}</td>
+                        <td>{{ user.user_gen_id }}</td>
+                        <td>{{ user.app_gen_id }}</td>
                         <td>{{ user.rank }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.unit }}</td>

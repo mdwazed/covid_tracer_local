@@ -13,6 +13,10 @@
     }
 }
 
+.source-user-info p {
+    line-height: .5;
+}
+
 .flex-div {
     display: flex;
     /* justify-content: space-around; */

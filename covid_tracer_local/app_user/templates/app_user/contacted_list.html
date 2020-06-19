@@ -6,18 +6,19 @@
     <div>
         <h4>Contacted list of </h4>
         <div class="flex-div-even-spaced">
-            <p>
-                <span>{{source.rank}}</span>&nbsp;<span>{{source.name}}</span>&nbsp;
-                <span>{{ source.unit }}</span> 
-            </p>
-            <p>
-                <span>Total count:</span>
-                &nbsp;<span>{{users|length}}</span>
-            </p>
-            <p>
-                <span>Date:</span>&nbsp;<span>{{from_date}}</span>&nbsp;<span>to</span>
-                &nbsp;<span>{{ to_date }}</span>
-            </p>
+            <div class="source-user-info">
+                <p>{{source.rank}}</p>
+                <p>{{source.name}}</p>
+                <p>{{ source.unit }}</p>
+            </div>
+            <div class="source-user-info">
+                <p>App ID:{{ source.app_gen_id }}</p>
+                <p>User ID:{{ source.user_gen_id }}</p>
+            </div>
+            <div class="source-user-info">
+                <p>From: &nbsp;<span>{{ from_date }}</span></p>
+                <p>To: &nbsp;<span>{{ to_date }}</span></p>
+            </div>
         </div>
         
     </div>
@@ -32,12 +33,12 @@
                  <th>Rank</th>
                  <th>Name</th>
                  <th>Unit</th>
-                 <th>Mob No</th>
+                 <th>Date Time</th>
                  <th>Rmks</th>
                 </tr>
             </thead>
             <tbody>
-                {% for user in users %}
+                {% for user in contacted_users %}
                     <tr>
                         <td>{{ user.pers_num }}</td>
                         <td>{{ user.user_gen_id }}</td>
@@ -45,6 +46,7 @@
                         <td>{{ user.rank }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.unit }}</td>
+                        <td>{{ user.contact_time }}</td>
                         <td>{{ user.mobile_num }}</td>
                         <td></td>
                     </tr>

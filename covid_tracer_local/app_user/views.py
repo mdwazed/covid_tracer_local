@@ -20,6 +20,7 @@ from django.db.models import F, Q, Count
 
 from app_user.forms import (PersInfoForm, LoginForm, UserSearchForm,)
 from app_user.models import PersInfo
+from app_user.utils import ContactedUser
 
 from datetime import datetime
 
@@ -174,7 +175,7 @@ class GetContactListView(View):
     template = 'app_user/contacted_list.html'
 
     def post(self, request):
-        print(request.POST)
+        # print(request.POST)
         try:
             app_user_id = request.POST.get('app-user-id', None)
             from_date = request.POST.get('from-date', None)
@@ -214,11 +215,12 @@ class GetContactListView(View):
                 except ObjectDoesNotExist:
                     pass
                 else:
-                    if contacted_user not in contacted_users:
-                        contacted_users.append(contacted_user)
+                    con_user = ContactedUser(contacted_user, contact['contact_time'])
+                    contacted_users.append(con_user)
+            contacted_users = set(contacted_users)
             context = {
                 'source': source_user,
-                'users': contacted_users,
+                'contacted_users': contacted_users,
                 'from_date': from_date,
                 'to_date': to_date,
             }

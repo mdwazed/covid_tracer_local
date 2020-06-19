@@ -44,7 +44,6 @@
                         <th>Rank</th>
                         <th>Nmae</th>
                         <th>unit</th>
-                        <th>Mob no</th>
                         <th>Action</th>
             
                     </tr>
@@ -58,7 +57,6 @@
                         <td>{{ user.rank }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.unit }}</td>
-                        <td>{{ user.mobile_num }}</td>
                         <td>
                             <input type="hidden" value="{{ user.id }}">
                             <button type="button" class="btn btn-link delete-btn" style="padding: 0;">Delete</button>
@@ -67,7 +65,7 @@
                                 <input type="hidden" name="from-date" value="{% past3day %}">
                                 <input type="hidden" name="to-date" value="{% now "d-m-Y" %}">
                                 <input type="hidden" name="app-user-id" value="{{ user.pk }}">
-                                ||<input type="submit" class="btn btn-link contact-btn" style="padding: 0;" value="Contact">
+                                <input type="submit" class="btn btn-link contact-btn" style="padding: 0;" value="Contact">
                             </form>
                         </td>
                     </tr>

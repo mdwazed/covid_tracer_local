@@ -1,5 +1,6 @@
 
-# from app_user.models import PersInfo
+from datetime import datetime
+
 
 rank_choices = [
     ('', '--------'),
@@ -27,7 +28,8 @@ class ContactedUser():
         self.app_gen_id = user.app_gen_id
         
         self.name = user.name
-        self.contact_time = contact_time
+        timestamp = datetime.fromtimestamp(int(contact_time))
+        self.contact_time = timestamp.strftime('%d-%m-%Y %H:%M:%S')
 
     def __str__(self):
         return self.name

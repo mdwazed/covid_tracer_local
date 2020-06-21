@@ -22,7 +22,7 @@ from app_user.forms import (PersInfoForm, LoginForm, UserSearchForm,)
 from app_user.models import PersInfo
 from app_user.utils import ContactedUser
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from requests.exceptions import HTTPError
@@ -148,7 +148,7 @@ def delete_app_user(request):
         return HttpResponse(status=204)
 
 class GetContactsView(View):
-    """ Receive the person to be traced """
+    """ Receive the person to be traced  and send API request"""
     template = 'app_user/get_contacts.html'
 
     def get(self, request):
@@ -171,7 +171,7 @@ class GetContactsView(View):
         return render(request, self.template, context)
 
 class GetContactListView(View):
-    """ Returns a list of contacted app_users """
+    """ Returns a list of contacted app_users from back end"""
     template = 'app_user/contacted_list.html'
 
     def post(self, request):
@@ -192,13 +192,15 @@ class GetContactListView(View):
             from_date_obj = datetime.strptime(from_date, '%d-%m-%Y')
             from_date_timestamp = int(datetime.timestamp(from_date_obj))
             to_date_obj = datetime.strptime(to_date, '%d-%m-%Y')
+            to_date_obj = to_date_obj + timedelta(days=1)
             to_date_timestamp = int(datetime.timestamp(to_date_obj))
             app_gen_key = source_user.app_gen_id
         else:
             err_msg = "Please select both from and to date."
             return render(request, self.template, {'err_msg': err_msg})
         # API call to get the list of contacted pers
-        url = f"http://dev.workspaceit.com:8081/api/v1/user/get/contact/?app_gen_key={app_gen_key}&range_start={from_date_timestamp}&range_end={to_date_timestamp}"
+        url = f"http://dev.workspaceit.com:8081/api/v1/user/get/contact/?"\
+            f"app_gen_key={app_gen_key}&range_start={from_date_timestamp}&range_end={to_date_timestamp}"
         print(url)
         try:
             response = requests.get(url)
@@ -207,17 +209,18 @@ class GetContactListView(View):
             return render(request, self.template, {'err_msg': err_msg})
         if response.status_code == 200:
             contact_data = json.loads(response.text)
-            # print(contact_data['data'])
+            # print(contact_data)
             contacted_users = []
             for contact in contact_data['data']:
                 try:
-                    contacted_user = PersInfo.objects.get(app_gen_id=contact['receiver']) 
+                    contacted_user = PersInfo.objects.get(app_gen_id=contact['user_id']) 
+                    # print(contacted_user)
                 except ObjectDoesNotExist:
                     pass
                 else:
                     con_user = ContactedUser(contacted_user, contact['contact_time'])
                     contacted_users.append(con_user)
-            contacted_users = set(contacted_users)
+            # contacted_users = set(contacted_users)
             context = {
                 'source': source_user,
                 'contacted_users': contacted_users,

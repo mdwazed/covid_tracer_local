@@ -13,8 +13,8 @@ class Unit(models.Model):
         return(self.unit_name)
 
 class PersInfo(models.Model):
-    user_gen_id = models.CharField(max_length=10)
-    app_gen_id = models.CharField(max_length=10, unique=True)
+    user_gen_id = models.CharField(max_length=12)
+    app_gen_id = models.CharField(max_length=12, unique=True)
     pers_num = models.CharField(max_length=10, null=True, blank=True)
     name = models.CharField(max_length=50,)
     rank = models.CharField(max_length=10, null=True, blank=True)

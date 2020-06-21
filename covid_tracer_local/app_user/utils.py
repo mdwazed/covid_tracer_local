@@ -26,10 +26,12 @@ class ContactedUser():
     def __init__(self, user, contact_time):
         self.user_gen_id = user.user_gen_id
         self.app_gen_id = user.app_gen_id
-        
+        self.rank = user.rank
         self.name = user.name
+        self.unit = user.unit
         timestamp = datetime.fromtimestamp(int(contact_time))
         self.contact_time = timestamp.strftime('%d-%m-%Y %H:%M:%S')
+        self.mobile_num = user.mobile_num
 
     def __str__(self):
         return self.name

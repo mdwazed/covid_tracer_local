@@ -29,6 +29,11 @@ from requests.exceptions import HTTPError
 import json
 
 # Create your views here.
+
+class ForceLoginView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+
 def home(request):
     past_date = datetime.today()
     context = {
@@ -103,12 +108,12 @@ class AddAppUserView(View):
             }
             return render(request, self.template, context)
 
-class UsersListView(ListView):
-    """ display truncated user list with option to delete any one """
-    model = PersInfo
-    template_name = 'app_user/users_list.html'
+# class UsersListView(ListView):
+#     """ display truncated user list with option to delete any one """
+#     model = PersInfo
+#     template_name = 'app_user/users_list.html'
 
-class FilteredUsersListView(View):
+class FilteredUsersListView(ForceLoginView):
     """ display users list based on search criteria """
     template = 'app_user/users_list.html'
     def get(self, request):
@@ -124,6 +129,7 @@ class FilteredUsersListView(View):
             unit = request.POST['unit']
             rank = request.POST['rank']
             app_gen_id = request.POST.get('app_gen_id', None)
+            print(f'app genid: {app_gen_id}')
         except ValueError:
             pass
         if app_gen_id:
@@ -147,7 +153,7 @@ def delete_app_user(request):
         PersInfo.objects.get(pk=app_user_id).delete()
         return HttpResponse(status=204)
 
-class GetContactsView(View):
+class GetContactsView(ForceLoginView):
     """ Receive the person to be traced  and send API request"""
     template = 'app_user/get_contacts.html'
 
@@ -170,7 +176,7 @@ class GetContactsView(View):
         }
         return render(request, self.template, context)
 
-class GetContactListView(View):
+class GetContactListView(ForceLoginView):
     """ Returns a list of contacted app_users from back end"""
     template = 'app_user/contacted_list.html'
 

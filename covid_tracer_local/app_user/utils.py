@@ -4,6 +4,7 @@ from datetime import datetime
 
 rank_choices = [
     ('', '--------'),
+    ('Civ', 'Civ'),
     ('Snk', 'Snk'),
     ('Lcpl', 'Lcpl'),
     ('Cpl', 'Cpl'),

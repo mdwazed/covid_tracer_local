@@ -21,6 +21,6 @@ class PersInfoForm(ModelForm):
 
 class UserSearchForm(forms.Form):
     unit_choices = Unit.objects.all()
-    unit = forms.ModelChoiceField(queryset=unit_choices)
-    rank = forms.ChoiceField(choices=utils.rank_choices)
-    app_gen_id = forms.CharField(max_length=10)
+    unit = forms.ModelChoiceField(queryset=unit_choices, required=False)
+    rank = forms.ChoiceField(choices=utils.rank_choices, required=False)
+    app_gen_id = forms.CharField(max_length=12, required=False)
